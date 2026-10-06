@@ -56,10 +56,10 @@ to read about a specific subcommand or concept.
 See 'git help git' for an overview of the system.
 
 C:\Users\user>
-'''
 
-versi dari git
-'''bash
+
+# versi dari git
+
 C:\Users\user>git --version
 git version 2.56.0.windows.2
 
