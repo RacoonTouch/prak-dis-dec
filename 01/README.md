@@ -58,7 +58,7 @@ See 'git help git' for an overview of the system.
 C:\Users\user>
 
 
-## versi dari git
+VERSI DARI GIT
 
 C:\Users\user>git --version
 git version 2.56.0.windows.2
