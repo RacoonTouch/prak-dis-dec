@@ -5,7 +5,8 @@ Pada Praktikum minggu 1 ini adalah pengenalan cara menggunakan git-github agar m
 alhasil
 
 
-##hasil dari instal git dan coba di cmd
+hasil dari instal git dan coba di cmd
+
 C:\Users\user>git
 usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
            [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
