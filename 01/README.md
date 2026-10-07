@@ -96,3 +96,22 @@ C:\Users\user>git --version
 git version 2.56.0.windows.2
 
 C:\Users\user>
+
+
+
+
+**KONFIGURASI Git**
+Pada sesi ini sesuai dengan instruksi, dalam mengkonfigurasi git tersebut user harus memberitahu tentang username dan email. Sehingga ada hal-hal yang perlu dilakukan seperti ini perintahnya:
+
+$ git config --global user.name "Nama Anda di GitHub"
+$ git config --global user.email email@domain.tld
+
+**menjadi**
+  |
+  |
+  V
+<img width="595" height="59" alt="konfigurasi-git-01" src="https://github.com/user-attachments/assets/bbbdc6fc-4b06-4594-a453-71e56e058c8d" />
+
+
+Pada saat sudah melakukan sesuai perintah diatas (saya lakukan di command prompt), untuk melihatnya perlu melakukannya seperti ini di terminal "git config --list" maka akan menjadi seperti ini outputnya:
+<img width="370" height="307" alt="konfigurasi-git-02" src="https://github.com/user-attachments/assets/2fd3a783-0fe6-47d9-b949-935ce2003cdf" />
