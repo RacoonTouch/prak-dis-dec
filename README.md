@@ -1,2 +1,2 @@
 # prak-dis-dec
-Laporan Praktikum Sistem Terdistribusi dan Desentralisasi
+Laporan Praktikum Sistem Terdistribusi Dan Desentralisasi
