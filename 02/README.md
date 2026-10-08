@@ -6,3 +6,6 @@
 
 <br></br>
 contoh task manager
+
+<img width="970" height="856" alt="image" src="https://github.com/user-attachments/assets/8257196a-51ea-4d28-923b-c7349aa77921" />
+contoh menginstal irm pada windows dan tes uv
