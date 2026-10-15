@@ -162,10 +162,96 @@ Installed 25 packages in 913ms
  + websockets==16.1.1
 ```
 
+**Buat file schema.py**
+
+<img width="285" height="317" alt="task-3" src="https://github.com/user-attachments/assets/a3471552-1577-4a4e-9364-683db44e8c08" /><br></br>
+
+**Jalankan Server**
+
+Perintah uv run menjalankan program menggunakan environment proyek tanpa perlu mengaktifkan .venv secara manual. strawberry dev schema menjalankan server GraphQL berdasarkan schema yang telah kita buat. Server ini bertugas menerima permintaan data dari client.
+<img width="422" height="36" alt="task-4" src="https://github.com/user-attachments/assets/d799f792-b5ec-4046-a1a3-930a9fb0bb7d" /><br></br>
+
+**Mengambil data buku menggunakan Query**
+
+Server GraphQL menerima permintaan dari pengguna, membaca field books, lalu mengembalikan data buku sesuai dengan definisi pada schema.py. Field title digunakan untuk memperoleh judul buku, sedangkan field author digunakan untuk memperoleh nama penulis. Pengujian ini memastikan bahwa schema yang dibuat dapat diakses melalui antarmuka GraphQL.
+<img width="949" height="237" alt="task-5" src="https://github.com/user-attachments/assets/0e3502de-ab9c-43fe-bda7-b963c073b739" /><br></br>
+
+**Membuat Client untuk mengakses server**
+
+PowerShell pertama tetap menjalankan server. Kita buka PowerShell kedua, kemudian menjalankan:
+```bash
+cd C:\Users\user\workspace-01
+notepad client.py
+```
+
+setelah membuat notepad baru untuk client lalu menambahkan kode ini dan save (Ctrl + S) lalu close notepad:
+```bash
+
+import json
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+
+url = "http://127.0.0.1:8000/graphql"
+
+query = """
+{
+    books {
+        title
+        author
+    }
+}
+"""
+
+payload = json.dumps({"query": query}).encode("utf-8")
+
+request = Request(
+    url,
+    data=payload,
+    headers={"Content-Type": "application/json"},
+    method="POST"
+)
+
+try:
+    with urlopen(request, timeout=10) as response:
+        result = json.loads(response.read().decode("utf-8"))
+
+    print("HASIL PERMINTAAN GRAPHQL")
+    print(json.dumps(result, indent=4, ensure_ascii=False))
+
+except HTTPError as error:
+    print("HTTP Error:", error.code)
+    print(error.read().decode("utf-8"))
+
+except URLError as error:
+    print("Gagal terhubung ke server:", error.reason)
+```
+
+**Menjalankan program client**
+
+Pada powershell kedua isi kode ini:
+```bash
+uv run --directory . python client.py
+```
+
+Dan jika berhasil maka akan seperti ini tampilan data buku dalam format JSONnya:
+```bash
+HASIL PERMINTAAN GRAPHQL
+{
+    "data": {
+        "books": [
+            {
+                "title": "The Great Gatsby",
+                "author": "F. Scott Fitzgerald"
+            }
+        ]
+    }
+}
+```
+Program client menggunakan modul urllib.request untuk mengirim permintaan HTTP ke alamat server GraphQL. Query ditulis untuk meminta field title dan author dari data books, kemudian dibungkus dalam format JSON agar dapat dikirim melalui HTTP POST. Header Content-Type: application/json memberitahukan server bahwa isi permintaan menggunakan format JSON.
+Setelah server memberikan respons, program membaca respons tersebut dan mengubahnya menjadi objek Python menggunakan json.loads(). Selanjutnya, data ditampilkan dengan format JSON yang lebih rapi. Penanganan HTTPError dan URLError ditambahkan agar program dapat memberikan informasi ketika server mengembalikan kesalahan HTTP atau tidak dapat dihubungi.
 
 
 
+<h3>Kesimpulan praktikum</h3>
 
-
-
-
+Komunikasi antarproses pada sistem terdistribusi dapat dilakukan melalui client dan server yang saling bertukar data menggunakan protokol HTTP. Dalam praktikum ini, server GraphQL menyediakan data buku berdasarkan schema yang telah dibuat, sedangkan client Python mengirimkan query dan menerima hasilnya dalam format JSON. Dengan demikian, client dapat memperoleh data dari server tanpa harus mengakses kode internal server secara langsung.
