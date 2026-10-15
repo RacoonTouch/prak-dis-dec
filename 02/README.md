@@ -1,5 +1,6 @@
-<h3> KOMUNIKASI ANTAR PROSES PADA SISTEM TERDISTRIBUSI </h3>
+<h2> PRAKTIKUM SISTEM TERDISTRIBUSI DAN TERDESENTRALISASI </h2>
 
+<h3> KOMUNIKASI ANTAR PROSES PADA SISTEM TERDISTRIBUSI </h3>
 
 
 Pada tugas pertama diperintahkan untuk melihat daftar proses yang terdiri dari penggunaan CPU, Memory, Disk dan Network. Setiap komputer akan berbeda-beda tampilan dan prosesnya.
