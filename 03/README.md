@@ -1,9 +1,12 @@
 <h1>Sinkronisasi pada Sistem terdistribusi</h1>
 
 <h3>3.1 Sinkronisasi Waktu</h3>
-**Output :**
+
+<img width="499" height="356" alt="sinkronisasi waktu" src="https://github.com/user-attachments/assets/64414fa6-06ce-4a1c-9aa0-57888409d256" />
+
 pembahasan :
 
+Proses sinkronisasi waktu pada sistem operasi Windows menggunakan aplikasi NetTime berjalan dengan sukses. Berdasarkan hasil pengujian pada aplikasi, komputer berhasil terhubung ke server acuan 0.nettime.pool.ntp.org dengan nilai lag jaringan sebesar 52 ms. Terdeteksi adanya offset sebesar -1033 ms yang kemudian dikoreksi secara otomatis oleh protokol NTP, sehingga jam lokal komputer kembali akurat dan tersinkronisasi penuh (Time is synchronized).
 
 <br></br>
 
