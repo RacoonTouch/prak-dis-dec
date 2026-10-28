@@ -1,6 +1,3 @@
-# prak-dis-dec
-Laporan Praktikum Sistem Terdistribusi Dan Desentralisasi
+<h1>Prak-dis-dec</h1>
 
-Nama: Rivael Takeshi Prabu
-
-NIM: 255410032
+**Laporan Praktikum Sistem Terdistribusi Dan Desentralisasi**
