@@ -655,20 +655,26 @@ Timeout not elapsed yet, circuit breaker still open
 
 **Analisis Output :**
 
+1. Percobaan pertama sampai ketiga mengalami kegagalan karena server Blacksheep sudah dimatikan. Pesan WinError 10061 menunjukkan bahwa tidak ada server yang menerima koneksi pada port 44777.
 
+2. Pada percobaan keempat, batas kegagalan sebanyak empat kali tercapai sehingga muncul pesan Failures threshold reached, circuit breaker opened. Hal ini menunjukkan bahwa Circuit Breaker berubah ke kondisi Open.
+
+3. Pada percobaan kelima, Circuit Breaker menolak permintaan karena masih berada dalam kondisi Open dan waktu tunggu 20 detik belum berlalu. Kondisi tersebut ditunjukkan melalui pesan Timeout not elapsed yet, circuit breaker still open.
+<br></br>
 
 
 **Pembahasan :**
 
+Pada pengujian ketika server tidak aktif, program mengalami kegagalan koneksi secara berulang karena tidak ada layanan yang berjalan pada port 44777. Setelah mencapai empat kegagalan sesuai pengaturan fail_max=4, Circuit Breaker berubah ke kondisi Open dan menghentikan permintaan berikutnya. Pesan Timeout not elapsed yet menunjukkan bahwa waktu tunggu selama 20 detik belum selesai sehingga koneksi masih ditolak. Mekanisme ini digunakan untuk mencegah sistem terus mengirim permintaan kepada server yang sedang mengalami gangguan.
+<br></br>
 
 
+<h3>KESIMPULAN</h3>
 
-
-
-
-
-
-
-
-
+1. Praktikum ini memberikan pemahaman mengenai penerapan Fault Tolerance dalam sistem terdistribusi untuk menjaga keandalan layanan ketika terjadi gangguan.
+2. Load Balancing menggunakan Nginx dan Docker Compose berhasil dijalankan dengan dua instance aplikasi Blacksheep. Kedua instance dapat menerima permintaan HTTP dan menghasilkan respons 200 OK.
+3. Heartbeat berhasil mendeteksi kondisi server melalui pemeriksaan koneksi. Ketika server tidak aktif, program menampilkan Server down, sedangkan ketika server aktif, program menampilkan Server up.
+4. Retry berhasil melakukan pengulangan permintaan ketika terjadi kegagalan koneksi. Pengujian menunjukkan bahwa permintaan berhasil ketika server aktif, sedangkan ketika server tidak aktif, program melakukan lima kali percobaan sebelum menampilkan pesan kegagalan.
+5. Circuit Breaker berhasil menghentikan sementara permintaan setelah mencapai empat kali kegagalan. Kondisi Open ditunjukkan melalui pesan Failures threshold reached, circuit breaker opened.
+6. Kesulitan dalam praktikum ini adalah menyiapkan lingkungan Docker, memastikan konfigurasi setiap layanan sesuai, serta membedakan hasil pengujian ketika server aktif dan tidak aktif. Setelah seluruh konfigurasi dan pengujian dilakukan, praktikum ini memberikan pemahaman mengenai cara meningkatkan ketersediaan dan ketahanan sistem terhadap kegagalan.
 
