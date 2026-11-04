@@ -382,6 +382,291 @@ Berdasarkan hasil pemeriksaan log, kedua instance aplikasi berhasil menerima per
 
 
 
+<h4>Heartbeat</h4>
+
+**4.2.1 Program heartbeat**
+
+File yang digunakan adalah:
+```
+PS C:\Users\user\workspace-05\src\load-balancing> Get-Content "$HOME\workspace-05\src\heartbeat\check-server.py"
+```
+```
+# taken from:
+# https://stackoverflow.com/questions/20867184/how-to-check-whether-my-server-is-up-and-running-using-python
+
+import sys
+import socket
+
+def servertest(argv):
+    host = argv[1]
+    port = int(argv[2])
+
+    args = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+    for family, socktype, proto, canonname, sockaddr in args:
+        s = socket.socket(family, socktype, proto)
+        try:
+            s.connect(sockaddr)
+        except socket.error:
+            return False
+        else:
+            s.close()
+            return True
+
+
+if __name__ == "__main__":
+    if servertest(sys.argv):
+        print("Server up")
+    else:
+        print("Server down")
+```
+**Pembahasan :**
+
+Program Heartbeat menggunakan library socket untuk memeriksa apakah server dapat menerima koneksi melalui alamat dan port tertentu. Variabel host digunakan untuk menyimpan alamat server, sedangkan port menyimpan nomor port yang akan diperiksa. Fungsi socket.getaddrinfo() mengambil informasi alamat koneksi, kemudian s.connect() mencoba menghubungkan program ke server. Jika koneksi gagal, fungsi mengembalikan nilai False; jika berhasil, fungsi mengembalikan nilai True.<br></br>
+
+
+**4.2.2 Pengujian Pertama – Server Tidak Aktif**
+
+Perintah yang digunakan:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\heartbeat\check-server.py" localhost 44777
+```
+**Output :**
+```
+Server down
+```
+**Pembahasan :**
+
+Pada pengujian pertama, aplikasi Blacksheep belum dijalankan sehingga tidak ada layanan yang menerima koneksi pada port 44777. Ketika program Heartbeat mencoba menghubungkan diri ke localhost:44777, koneksi gagal dan program menampilkan Server down. Hasil tersebut menunjukkan bahwa mekanisme Heartbeat dapat mendeteksi kondisi server yang tidak aktif melalui pemeriksaan koneksi.<br></br>
+
+
+**4.2.3 Pengujian Kedua – Server Aktif**
+
+Aplikasi Blacksheep dijalankan menggunakan perintah berikut:
+```
+cd "$HOME\workspace-05\src\load-balancing\blacksheep_lb"
+
+& "$HOME\workspace-05\.venv\Scripts\python.exe" dev.py
+```
+**Output saat server dijalankan :**
+```
+Running for local development
+Visit http://localhost:44777/
+
+INFO: Started server process [10896]
+INFO: Waiting for application startup.
+INFO: Application startup complete.
+INFO: Uvicorn running on http://localhost:44777 (Press CTRL+C to quit)
+```
+Setelah server aktif, jalankan kembali program Heartbeat pada PowerShell lain:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\heartbeat\check-server.py" localhost 44777
+```
+**Output :**
+```
+Server up
+```
+
+**Pembahasan :**
+
+Pengujian pertama – Server tidak aktif
+
+Program Heartbeat menggunakan library socket untuk memeriksa apakah server dapat menerima koneksi melalui alamat dan port yang ditentukan. Ketika aplikasi Blacksheep tidak dijalankan, program menampilkan Server down karena koneksi ke localhost:44777 gagal dilakukan. Hasil tersebut menunjukkan bahwa program dapat mendeteksi kondisi server yang tidak aktif.
+
+Pengujian kedua – Server aktif
+
+Ketika aplikasi Blacksheep dijalankan menggunakan Uvicorn pada port 44777, program Heartbeat berhasil terhubung ke server dan menampilkan Server up. Hal ini menunjukkan bahwa pemeriksaan koneksi berhasil dilakukan ketika layanan tersedia. Dengan demikian, mekanisme Heartbeat dapat digunakan untuk mengetahui apakah server dapat dijangkau atau tidak.<br></br>
+
+
+<h4>4.3 Retry</h4>
+
+**4.3.1 Program Retry**
+
+File yang digunakan adalah:
+```
+src\failure-detection\check-retry.py"
+```
+```
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+
+import requests
+
+@retry(
+    stop=stop_after_attempt(5),  # Stop after 5 attempts
+    wait=wait_exponential(multiplier=1, min=4, max=10), # Exponential backoff with min 4s, max 10s
+    retry=retry_if_exception_type(requests.exceptions.ConnectionError) # Retry only on connection errors
+)
+
+def make_http_request(url):
+    print(f"Attempting to access {url}...")
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+    print(f"Successfully accessed {url}")
+    return response.text
+
+try:
+    content = make_http_request("http://localhost:44777")
+    # Process the content
+except Exception as e:
+    print(f"Failed to access URL after multiple retries: {e}")
+```
+
+**Pembahasan :**
+
+Program Retry menggunakan library Tenacity dan Requests untuk mengatur pengulangan permintaan HTTP. Pengaturan stop_after_attempt(5) membatasi jumlah percobaan maksimal sebanyak lima kali. Fungsi wait_exponential() memberikan jeda bertahap dengan waktu minimum empat detik dan maksimum sepuluh detik. Sementara itu, retry_if_exception_type() menentukan bahwa pengulangan dilakukan ketika terjadi ConnectionError. Permintaan HTTP dikirim menggunakan requests.get(), sedangkan response.raise_for_status() digunakan untuk memeriksa apakah respons HTTP menunjukkan kesalahan.<br></br>
+
+
+**4.3.2 Pengujian Pertama – Server Aktif**
+
+Pastikan aplikasi Blacksheep berjalan pada port 44777. Kemudian jalankan program Retry melalui PowerShell lain:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\failure-detection\check-retry.py"
+```
+**Output :**
+```
+Attempting to access http://localhost:44777...
+Successfully accessed http://localhost:44777
+```
+
+**Pembahasan :**
+
+Pada pengujian ketika server aktif, program berhasil mengirim permintaan HTTP ke alamat localhost:44777. Output Successfully accessed menunjukkan bahwa server memberikan respons yang berhasil diterima oleh program. Mekanisme Retry tidak perlu melakukan pengulangan karena permintaan pertama sudah berhasil. Hal ini memperlihatkan bahwa Retry tetap dapat menjalankan permintaan secara normal ketika layanan tersedia.<br></br>
+
+
+**4.3.3 Pengujian Kedua – Server Tidak Aktif**
+
+Pastikan aplikasi Blacksheep telah dihentikan dengan menekan CTRL + C pada terminal yang menjalankan dev.py. Setelah itu, jalankan kembali program Retry:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\failure-detection\check-retry.py"
+```
+**Output :**
+```
+Attempting to access http://localhost:44777...
+Attempting to access http://localhost:44777...
+Attempting to access http://localhost:44777...
+Attempting to access http://localhost:44777...
+Attempting to access http://localhost:44777...
+
+Failed to access URL after multiple retries: RetryError[<Future at 0x2ce20d25480 state=finished raised ConnectionError>]
+```
+
+**Pembahasan :**
+
+Pada pengujian ketika server tidak aktif, program melakukan lima kali percobaan untuk mengakses alamat localhost:44777. Setiap percobaan mengalami ConnectionError karena tidak ada server yang menerima koneksi pada port tersebut. Library Tenacity kemudian menjalankan mekanisme retry dengan jeda bertahap hingga mencapai batas percobaan yang ditentukan. Setelah seluruh percobaan gagal, program menampilkan pesan Failed to access URL after multiple retries. Hasil ini menunjukkan bahwa mekanisme Retry dapat memberikan kesempatan kepada sistem untuk mencoba kembali permintaan sebelum menyatakan proses gagal.<br></br>
+
+
+<h4>4.4 Circuit breaker</h4>
+
+**4.4.1 Program Circuit Breaker**
+
+File yang digunakan adalah src/failure-detection/check-circuit-breaker.py. Untuk memperlihatkan perubahan kondisi Circuit Breaker saat server tidak aktif, bagian akhir program menggunakan perulangan sebanyak lima kali. Program ini menggunakan Python.
+```
+import pybreaker
+import requests
+
+breaker = pybreaker.CircuitBreaker(fail_max=4, reset_timeout=20)
+
+@breaker
+def make_http_request(url):
+    print(f"Attempting to access {url}...")
+    response = requests.get(url)
+    response.raise_for_status()
+    print(f"Successfully accessed {url}")
+    return response.text
+
+for i in range(5):
+    try:
+        content = make_http_request("http://localhost:44777")
+    except Exception as e:
+        print(e)
+```
+**Pembahasan :**
+
+Program Circuit Breaker menggunakan library pybreaker untuk menghentikan sementara permintaan ketika server mengalami kegagalan berulang. Pengaturan fail_max=4 menentukan batas kegagalan sebanyak empat kali, sedangkan reset_timeout=20 menentukan waktu tunggu selama 20 detik sebelum sistem dapat mencoba kembali. Dekorator @breaker menerapkan mekanisme Circuit Breaker pada fungsi make_http_request(). Perulangan for i in range(5) digunakan agar program melakukan lima kali percobaan sehingga perubahan kondisi Circuit Breaker dapat terlihat ketika server tidak aktif.
+
+Kondisi Circuit Breaker:
+Kondisi:      Penjelasan
+Closed:       Permintaan diizinkan seperti biasa selama belum mencapai batas kegagalan.
+Open:         Permintaan dihentikan sementara setelah batas kegagalan tercapai.
+Half-open:    Setelah waktu tunggu, sistem mengizinkan percobaan untuk memeriksa apakah server sudah pulih.
+<br></br>
+
+
+**4.4.2 Pengujian Pertama – Server Aktif**
+
+Jalankan aplikasi Blacksheep:
+```
+cd "$HOME\workspace-05\src\load-balancing\blacksheep_lb"
+
+& "$HOME\workspace-05\.venv\Scripts\python.exe" dev.py
+```
+**Output saat server dijalankan:**
+```
+Running for local development
+Visit http://localhost:44777/
+
+INFO: Started server process [10952]
+INFO: Waiting for application startup.
+INFO: Application startup complete.
+INFO: Uvicorn running on http://localhost:44777 (Press CTRL+C to quit)
+```
+
+Setelah server aktif, buka PowerShell lain dan jalankan program Circuit Breaker:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\failure-detection\check-circuit-breaker.py"
+```
+**Output :**
+```
+Attempting to access http://localhost:44777...
+Successfully accessed http://localhost:44777
+```
+**Pembahasan :**
+
+ada pengujian ketika server aktif, program berhasil mengirim permintaan HTTP dan memperoleh respons dari aplikasi Blacksheep. Output Successfully accessed menunjukkan bahwa layanan dapat diakses tanpa mengalami kegagalan koneksi. Karena permintaan berhasil dilakukan, Circuit Breaker tetap berada dalam kondisi Closed sehingga permintaan berikutnya masih dapat diproses seperti biasa.<br></br>
+
+
+**4.4.3 Pengujian Kedua – Server Tidak Aktif**
+
+Pertama, hentikan aplikasi Blacksheep dengan menekan CTRL + C pada terminal yang menjalankan dev.py. Kemudian jalankan program Circuit Breaker yang sudah menggunakan perulangan lima kali.
+
+Perintah yang digunakan:
+```
+& "$HOME\workspace-05\.venv\Scripts\python.exe" "$HOME\workspace-05\src\failure-detection\check-circuit-breaker.py"
+```
+**Output :**
+```
+Attempting to access http://localhost:44777...
+
+HTTPConnectionPool(host='localhost', port=44777): Max retries exceeded with url: / (Caused by NewConnectionError("HTTPConnection(host='localhost', port=44777): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+
+Attempting to access http://localhost:44777...
+
+HTTPConnectionPool(host='localhost', port=44777): Max retries exceeded with url: / (Caused by NewConnectionError("HTTPConnection(host='localhost', port=44777): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+
+Attempting to access http://localhost:44777...
+
+HTTPConnectionPool(host='localhost', port=44777): Max retries exceeded with url: / (Caused by NewConnectionError("HTTPConnection(host='localhost', port=44777): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+
+Attempting to access http://localhost:44777...
+
+Failures threshold reached, circuit breaker opened
+
+Timeout not elapsed yet, circuit breaker still open
+```
+
+**Analisis Output :**
+
+
+
+
+**Pembahasan :**
+
+
+
+
+
+
+
+
 
 
 
