@@ -19,6 +19,10 @@ uv --version
 ```
 sqlite3 --version
 ```
+**Pembahasan:**
+
+Di bagian pertama ini dilakukan pemeriksaan terhadap lingkungan kerja yang akan digunakan untuk praktikum Arsitektur Microservices. Pemeriksaan dilakukan melalui Windows PowerShell dengan menggunakan perintah python --version, uv --version, dan sqlite3 --version. Berdasarkan hasil pemeriksaan, Python belum tersedia secara langsung pada sistem Windows, sedangkan uv telah berhasil terpasang dengan versi 0.13.1. Sementara itu, perintah SQLite belum dapat dikenali oleh sistem. Pemeriksaan ini bertujuan untuk mengetahui perangkat lunak yang sudah tersedia dan menentukan kebutuhan instalasi sebelum proses pengembangan REST API dilakukan.<br></br>
+
 
 ## 2. Menginstal Python 3.14.4
 
@@ -36,6 +40,10 @@ Output jika sudah terinstal:
 ```
 cpython-3.14.8-windows-x86_64-none...
 ```
+**Pembahasan:**
+
+Bagian kedua ini dilakukan instalasi Python menggunakan bantuan pengelola paket uv melalui perintah uv python install 3.14.4. Penggunaan uv mempermudah proses pengunduhan dan pengelolaan versi Python tanpa harus melakukan instalasi secara manual melalui Windows. Setelah proses instalasi selesai, dilakukan pemeriksaan menggunakan perintah uv python list --only-installed untuk memastikan Python telah terpasang. Hasil pemeriksaan menunjukkan bahwa Python sudah tersedia dan dapat digunakan sebagai interpreter dalam menjalankan program.<br></br>
+
 
 ## 3. Membuat folder proyek
 
@@ -65,6 +73,10 @@ Hasilnya kurang lebih:
 ```
 C:\Users\user\Documents\praktikum-modul-8
 ```
+**Pembahasan:**
+
+Pembuatan direktori dilakukan menggunakan perintah mkdir, sedangkan perintah cd digunakan untuk berpindah ke lokasi direktori tersebut. Setelah itu, source code dari arsip src-08.tar.bz2 diekstrak menggunakan perintah tar -xjf sehingga menghasilkan folder src yang berisi berkas program, database, dan konfigurasi proyek. Pada folder tersebut kemudian dibuat virtual environment menggunakan uv venv --python 3.14.4 dan diaktifkan melalui perintah .venv\Scripts\Activate.ps1. Lingkungan virtual ini digunakan agar instalasi paket dan kebutuhan Python pada praktikum dapat dikelola secara terpisah dari lingkungan sistem utama.<br></br>
+
 
 ## 4. Mengekstrak source code
 
@@ -93,6 +105,9 @@ departemen-sdm.db
 service.py
 requirements.txt
 ```
+**Pembahasan:**
+
+Arsip src-08.tar.bz2 yang telah disiapkan perlu diekstrak terlebih dahulu agar seluruh berkas program dapat digunakan dalam praktikum. Proses ekstraksi dilakukan melalui PowerShell dengan perintah tar -xjf, yang berfungsi untuk membuka arsip dan menghasilkan folder src. Setelah proses tersebut selesai, perintah cd src digunakan untuk masuk ke direktori hasil ekstraksi, sedangkan dir digunakan untuk melihat daftar berkas di dalamnya. Hasil pemeriksaan menunjukkan adanya beberapa berkas penting, seperti service.py, departemen-sdm.db, requirements.txt, dan .python-version.<br></br>
 
 
 ## 5. Membuat virtual environment
@@ -117,6 +132,10 @@ Output:
 ```
 (.venv) PS C:\Users\user\Documents\praktikum-modul-8\src>
 ```
+**Pembahasan:**
+
+Agar kebutuhan Python pada proyek dapat dikelola secara terpisah, dibuat lingkungan virtual menggunakan perintah uv venv --python 3.14.4. Perintah tersebut menghasilkan direktori .venv yang berfungsi sebagai tempat penyimpanan lingkungan Python khusus untuk proyek Modul 8. Selanjutnya, lingkungan tersebut diaktifkan menggunakan perintah .venv\Scripts\Activate.ps1 melalui Windows PowerShell. Ketika proses aktivasi berhasil, muncul tanda (src) pada bagian awal terminal yang menunjukkan bahwa lingkungan virtual telah aktif.<br></br>
+
 
 ## 6. Instalasi FastAPI dan SQLModel
 
@@ -204,6 +223,11 @@ Pastikan terdapat:
 - sqlalchemy
 - uvicorn
 
+**Pembahasan:**
+
+Bagian enam ini kebutuhan pustaka untuk membangun layanan backend dipenuhi dengan memasang FastAPI dan SQLModel melalui perintah uv pip install "fastapi[standard]" sqlmodel. Proses instalasi menghasilkan sejumlah paket pendukung, termasuk FastAPI, SQLModel, SQLAlchemy, dan Uvicorn. Setelah pemasangan selesai, perintah uv pip list digunakan untuk memeriksa daftar paket yang telah terinstal di lingkungan virtual.<br></br>
+
+
 ## 7. Menginstal SQLite di Windows
 
 **7.1 Download SQLite**
@@ -249,6 +273,10 @@ Seharusnya muncul informasi versi SQLite. Contoh:
 ```
 3.54.1 2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76 (64-bit)
 ```
+**Pembahasan:**
+
+Bagian ini berbeda dengan Python yang dikelola menggunakan uv, SQLite Command Line Tools perlu disiapkan secara terpisah agar dapat digunakan melalui Windows PowerShell. Instalasi dilakukan dengan mengunduh paket sqlite-tools-win-x64 dari situs resmi SQLite, kemudian mengekstrak isinya ke direktori C:\sqlite. Setelah itu, lokasi SQLite ditambahkan ke variabel PATH sementara menggunakan perintah $env:Path += ";C:\sqlite". Pemeriksaan dilakukan melalui perintah sqlite3 --version dan menghasilkan informasi versi SQLite yang terpasang.<br></br>
+
 
 ## 8. Memeriksa database contoh
 
@@ -269,6 +297,11 @@ Hasilnya menampilkan tiga data karyawan, yaitu Karyawan 1, Karyawan 2, dan Karya
 **Output:**
 
 <img width="770" height="270" alt="image" src="https://github.com/user-attachments/assets/1f5acc0f-de8c-43c4-9907-c5ef65d2f28a" />
+
+**Pembahasan:**
+
+Database contoh yang disediakan dalam source code diperiksa menggunakan SQLite melalui perintah sqlite3 departemen-sdm.db. Setelah berhasil masuk ke lingkungan SQLite, perintah .tables digunakan untuk mengetahui tabel yang tersedia di dalam database. Selanjutnya, perintah SELECT * FROM sdm; dijalankan untuk mengambil seluruh isi tabel SDM. Berdasarkan hasil yang ditampilkan, terdapat tiga data karyawan dengan informasi NPP dan nama masing-masing. Hasil tersebut menunjukkan bahwa database berhasil dibuka dan data yang telah disediakan dapat dibaca menggunakan perintah SQL.<br></br>
+
 
 ## 9. Menjalankan FastAPI
 
@@ -312,7 +345,7 @@ Output:
 
 **Pembahasan:**
 
-Pada tahap ini, source code service.py dijalankan menggunakan FastAPI untuk menyediakan layanan REST API. Endpoint /sdm/ digunakan untuk mengambil seluruh data karyawan dari database SQLite. Data yang diperoleh kemudian dikirimkan kepada pengguna dalam format JSON sehingga dapat diakses melalui browser maupun perintah curl.<br></br>
+Pada tahap ini, source code service.py dijalankan menggunakan FastAPI untuk menyediakan layanan REST API. Setelah perintah dijalankan, server FastAPI berhasil aktif pada alamat http://127.0.0.1:8000 dan menampilkan pesan Application startup complete. sebagai tanda bahwa aplikasi telah selesai melakukan proses inisialisasi. Pengujian kemudian dilakukan dengan mengakses endpoint /sdm/ melalui browser dan perintah curl.exe http://127.0.0.1:8000/sdm/. Hasil pengujian menunjukkan tiga data karyawan berhasil ditampilkan dalam format JSON, yang mencakup ID, NPP, dan nama karyawan.<br></br>
 
 
 ## TUGAS
@@ -460,6 +493,9 @@ muncul lima data JSON dengan informasi seperti ini dia: ID Produk, Kode produk, 
 **Pembahasan :**
 
 Pada tahap ini dilakukan implementasi RESTful API menggunakan FastAPI untuk menampilkan seluruh data produk yang tersimpan dalam database SQLite. Endpoint GET /produk/ dibuat dengan SQLModel untuk mengambil data menggunakan perintah select(Produk). Selanjutnya, pengujian dilakukan menggunakan curl.exe untuk mengirimkan HTTP GET request ke server. Hasil pengujian ditampilkan dalam format JSON yang berisi lima data produk beserta atributnya. Sehingga, menampilkan seluruh data dari tabel baru melalui REST API.<br></br>
+
+
+
 
 
 
